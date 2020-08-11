@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <Folder Include="features\" />
-    <Folder Include="hooks\NewFolder\" />
   </ItemGroup>
 
 </Project>

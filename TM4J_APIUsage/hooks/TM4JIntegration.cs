@@ -10,6 +10,9 @@ using TechTalk.SpecFlow;
 
 namespace TM4J_APIUsage.hooks
 {
+    /// <summary>
+    /// A Synchronous example of TM4J Integration
+    /// </summary>
     [Binding]
     public class TM4JIntegration
     {
@@ -28,7 +31,7 @@ namespace TM4J_APIUsage.hooks
         [AfterScenario]
         public void ScenarioIntegrateWithTM4J(ScenarioContext context)
         {
-            updateTestCycle(context);
+            executeActionInCycle(context);
         }
 
         /// <summary>
@@ -38,7 +41,7 @@ namespace TM4J_APIUsage.hooks
         { 
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JiraAuthToken);
-            var CycleName = $"Automation Run - {DateTime.Now.ToString("dd-mm-yyyy hh:mm:ss")}";
+            var CycleName = $"Automation Run - {DateTime.Now:dd-mm-yyyy hh:mm:ss}";
             var jsonData = @$"{{
             ""projectKey"": ""{JiraProjectKey}"",
             ""name"": ""{CycleName}"",
@@ -48,22 +51,29 @@ namespace TM4J_APIUsage.hooks
             var response = client.PostAsync("https://api.adaptavist.io/tm4j/v2/testcycles", stringContent).Result;
             var content = response.Content.ReadAsStringAsync().Result;
             dynamic testCycleConfirmationBody = JsonConvert.DeserializeObject(content);
+
+            //We need the test cycle key from the response of the above to append our executions to
             TestCycleKey = testCycleConfirmationBody.key;
+
+            //Tells the system that a cycle has been created so we don't need to make another one for subsequent tests
             TestCycleCreated = true;
         }
 
         /// <summary>
         /// Calls out to TM4J Instance to append the current test to the created cycle
         /// </summary>
-        private static void updateTestCycle(ScenarioContext context)
+        private static void executeActionInCycle(ScenarioContext context)
         {
             var key = context.ScenarioInfo.Tags[0].Split('=')[1];
 
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JiraAuthToken);
 
+            //Determine if the test has passed or failed and set a suitable string as the comment
             var result = context.TestError == null ? "Pass" : "Fail";
             var resultComment = context.TestError == null ? "Test Passed" : "Test Failed";
+
+
             var jsonData = @$"{{
                     ""projectKey"": ""RG"",
                     ""testCaseKey"": ""{key}"",

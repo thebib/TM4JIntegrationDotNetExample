@@ -12,6 +12,7 @@ namespace TM4J_APIUsage.hooks
 {
     /// <summary>
     /// A Synchronous example of TM4J Integration
+    /// An API Guide is available at https://support.smartbear.com/tm4j-cloud/api-docs/
     /// </summary>
     [Binding]
     public class TM4JIntegration
@@ -55,7 +56,7 @@ namespace TM4J_APIUsage.hooks
             //We need the test cycle key from the response of the above to append our executions to
             TestCycleKey = testCycleConfirmationBody.key;
 
-            //Tells the system that a cycle has been created so we don't need to make another one for subsequent tests
+            //Tells future features that a cycle has been created so we don't need to make another one for subsequent tests
             TestCycleCreated = true;
         }
 
